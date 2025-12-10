@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  /* System Theme Colors */
+  --color-system-blue: var(--system-blue);
+  --color-system-green: var(--system-green);
+  --color-system-red: var(--system-red);
+  --color-system-bg: var(--system-bg);
+  --color-system-panel: var(--system-panel);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* System Fonts */
+  --font-rajdhani: 'Rajdhani', sans-serif;
+  --font-tech: 'Share Tech Mono', monospace;
+
+  /* Animations */
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-fade-in-up: fadeInUp 0.5s ease-out forwards;
+  --animate-glitch: glitch 1s linear infinite;
+  --animate-scanline: scanline 8s linear infinite;
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-glow: glow 2s ease-in-out infinite;
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes glow {
+
+    0%,
+    100% {
+      box-shadow: 0 0 5px var(--system-green), 0 0 10px var(--system-green);
+    }
+
+    50% {
+      box-shadow: 0 0 20px var(--system-green), 0 0 30px var(--system-green);
+    }
+  }
+
+  @keyframes glitch {
+    0% {
+      transform: translate(0)
+    }
+
+    20% {
+      transform: translate(-2px, 2px)
+    }
+
+    40% {
+      transform: translate(-2px, -2px)
+    }
+
+    60% {
+      transform: translate(2px, 2px)
+    }
+
+    80% {
+      transform: translate(2px, -2px)
+    }
+
+    100% {
+      transform: translate(0)
+    }
+  }
+
+  @keyframes scanline {
+    0% {
+      background-position: 0% 0%;
+    }
+
+    100% {
+      background-position: 0% 100%;
+    }
+  }
+}
+
+:root {
+  /* Stealth Green & Black Theme (Base) */
+  --background: #020202;
+  --foreground: #e5e5e5;
+
+  /* Primary Green (Legacy) */
+  --primary: #00e573;
+  --primary-foreground: #000000;
+
+  /* System Theme Colors (The New Standard) */
+  --system-blue: #00F0FF;
+  --system-green: #00FF9D;
+  --system-red: #FF2A2A;
+  --system-bg: #050510;
+  --system-panel: rgba(10, 15, 30, 0.85);
+
+  --muted: #1a1a1a;
+  --muted-foreground: #737373;
+
+  --card: #0a0a0a;
+  --card-foreground: #e5e5e5;
+
+  --popover: #0a0a0a;
+  --popover-foreground: #e5e5e5;
+
+  --border: #1f1f1f;
+  --input: #1f1f1f;
+
+  --ring: #00e573;
+
+  --radius: 0.5rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  @apply selection:bg-system-green/20 selection:text-system-green;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--system-green);
+}
+
+/* Glass effect utility */
+.glass {
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* System Window effect */
+.system-window {
+  background: rgba(5, 5, 20, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+  position: relative;
+}
+
+.system-window::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--system-blue), transparent);
+}
+
+.system-window::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid var(--system-blue);
+  border-right: 2px solid var(--system-blue);
+}
+
+/* Grid background pattern */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-dot {
+  background-image: radial-gradient(rgba(0, 255, 157, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
