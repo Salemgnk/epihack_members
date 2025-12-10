@@ -27,11 +27,11 @@ export default function Sidebar() {
   }, [expanded]);
 
   const pageLinks = [
-    { label: "Dashboard", href: "/members", icon: PanelsLeftRight },
-    { label: "Rankings", href: "/members/leaderboard", icon: Trophy },
-    { label: "Arena", href: "/members/duels", icon: Swords },
-    { label: "Profile", href: "/members/profile/me", icon: Target }, // Using 'me' which Profile page should handle or redirect
-    { label: "Access", href: "/members/settings/htb", icon: Terminal },
+    { label: "Dashboard", href: "/", icon: PanelsLeftRight },
+    { label: "Rankings", href: "/leaderboard", icon: Trophy },
+    { label: "Arena", href: "/duels", icon: Swords },
+    { label: "Profile", href: "/profile/me", icon: Target },
+    { label: "Access", href: "/settings/htb", icon: Terminal },
   ];
 
   return (
