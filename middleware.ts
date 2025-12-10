@@ -3,6 +3,23 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
+  // Routes publiques (pas de vérification d'auth)
+  const publicRoutes = ['/login', '/auth/callback', '/force-logout', '/api', '/_next', '/favicon.ico'];
+  const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route));
+
+  if (isPublicRoute) {
+    return NextResponse.next();
+  }
+
+  // Vérifier que les variables d'environnement sont définies
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase environment variables');
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -10,8 +27,8 @@ export async function middleware(request: NextRequest) {
   });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         get(name: string) {
@@ -54,14 +71,6 @@ export async function middleware(request: NextRequest) {
       },
     }
   );
-
-  // Routes publiques (pas de vérification d'auth)
-  const publicRoutes = ['/login', '/auth/callback', '/force-logout', '/api', '/_next', '/favicon.ico'];
-  const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route));
-
-  if (isPublicRoute) {
-    return response;
-  }
 
   // Vérifier la session pour toutes les autres routes
   const { data: { session } } = await supabase.auth.getSession();
