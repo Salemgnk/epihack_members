@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase-client';
-import { Trophy, Zap, Target, TrendingUp, ExternalLink, Activity } from 'lucide-react';
+import { ExternalLink, Activity, Trophy, Zap, MessageSquare, Sword, Crown, Flag } from 'lucide-react';
 import Link from 'next/link';
+import { StatusWindow } from '@/components/system/StatusWindow';
+import { SystemWindow } from '@/components/system/SystemWindow';
+import { PlayerAttributes, PlayerStats } from '@/lib/system-types';
 
 interface Profile {
     id: string;
@@ -14,6 +17,14 @@ interface Profile {
     total_points: number;
     year: string;
     github_username: string;
+    // System Stats
+    attributes: PlayerStats;
+    job_class: string;
+    title: string;
+    level: number;
+    experience: number;
+    mana: number;
+    max_mana: number;
 }
 
 interface HTBProfile {
@@ -70,7 +81,18 @@ export default function DashboardPage() {
                 .single();
 
             if (profileData) {
-                setProfile(profileData);
+                // Ensure default attributes if missing (migration safety)
+                const safeProfile = {
+                    ...profileData,
+                    attributes: profileData.attributes || { STR: 10, AGI: 10, INT: 10, VIT: 10, SENSE: 10 },
+                    level: profileData.level || 1,
+                    job_class: profileData.job_class || 'Novice',
+                    title: profileData.title || 'Player',
+                    mana: profileData.mana || 100,
+                    max_mana: profileData.max_mana || 100,
+                    experience: profileData.experience || 0
+                };
+                setProfile(safeProfile);
             }
 
             // Fetch HTB profile
@@ -82,20 +104,15 @@ export default function DashboardPage() {
 
             if (htbData) {
                 setHtbProfile(htbData);
-
-                // Fetch HTB stats cache
                 const { data: statsData } = await supabase
                     .from('htb_stats_cache')
                     .select('*')
                     .eq('htb_profile_id', htbData.id)
                     .single();
-
-                if (statsData) {
-                    setHtbStats(statsData);
-                }
+                if (statsData) setHtbStats(statsData);
             }
 
-            // Fetch recent points transactions
+            // Fetch transactions
             const { data: transactions } = await supabase
                 .from('points_transactions')
                 .select('*')
@@ -103,9 +120,7 @@ export default function DashboardPage() {
                 .order('created_at', { ascending: false })
                 .limit(5);
 
-            if (transactions) {
-                setRecentTransactions(transactions);
-            }
+            if (transactions) setRecentTransactions(transactions);
 
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
@@ -116,241 +131,190 @@ export default function DashboardPage() {
 
     const getSourceIcon = (source: string) => {
         switch (source) {
-            case 'htb': return '🎯';
-            case 'discord': return '💬';
-            case 'github': return '💻';
-            case 'ctf': return '🚩';
-            case 'duel': return '⚔️';
-            case 'admin': return '👑';
-            default: return '✨';
+            case 'htb': return <Target className="w-5 h-5 text-system-red" />;
+            case 'discord': return <MessageSquare className="w-5 h-5 text-system-blue" />;
+            case 'github': return <ExternalLink className="w-5 h-5 text-white" />;
+            case 'ctf': return <Flag className="w-5 h-5 text-yellow-500" />;
+            case 'duel': return <Sword className="w-5 h-5 text-purple-500" />;
+            case 'admin': return <Crown className="w-5 h-5 text-yellow-400" />;
+            default: return <Zap className="w-5 h-5 text-system-green" />;
         }
     };
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMs / 3600000);
-        const diffDays = Math.floor(diffMs / 86400000);
-
-        if (diffMins < 60) return `Il y a ${diffMins} min`;
-        if (diffHours < 24) return `Il y a ${diffHours}h`;
-        if (diffDays < 7) return `Il y a ${diffDays}j`;
-        return date.toLocaleDateString('fr-FR');
+        return date.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
 
     if (loading) {
         return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="system-window p-6 rounded-lg">
-                    <div className="flex items-center justify-center h-64">
-                        <div className="text-center">
-                            <div className="w-12 h-12 border-2 border-system-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                            <p className="text-muted-foreground font-tech">Chargement du dashboard...</p>
-                        </div>
-                    </div>
+            <div className="min-h-screen flex items-center justify-center bg-black">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-2 border-system-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-system-blue font-tech animate-pulse">INITIALIZING SYSTEM...</p>
                 </div>
             </div>
         );
     }
 
+    if (!profile) return null;
+
+    const playerAttributes: PlayerAttributes = {
+        level: profile.level,
+        experience: profile.experience,
+        job_class: profile.job_class,
+        title: profile.title,
+        mana: profile.mana,
+        max_mana: profile.max_mana,
+        attributes: profile.attributes
+    };
+
     return (
-        <div className="container mx-auto px-4 py-8">
-            {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-4xl font-rajdhani font-bold text-system-green mb-2">
-                    Welcome back, {profile?.username || 'Member'}!
-                </h1>
-                <p className="text-muted-foreground">
-                    {profile?.year && `${profile.year} • `}
-                    {profile?.is_admin && '👑 Admin • '}
-                    Membre EPIHACK
-                </p>
-            </div>
+        <div className="min-h-screen bg-[url('/assets/grid-bg.png')] bg-fixed bg-cover p-4 md:p-8">
+            <div className="max-w-7xl mx-auto space-y-8">
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                {/* Total Points */}
-                <div className="glass p-6 rounded-lg border border-system-green/30">
-                    <div className="flex items-center gap-3 mb-3">
-                        <Trophy className="w-6 h-6 text-system-green" />
-                        <h3 className="text-sm font-rajdhani font-semibold text-muted-foreground uppercase">
-                            Total Points
-                        </h3>
-                    </div>
-                    <p className="text-4xl font-mono font-bold text-system-green">
-                        {profile?.total_points?.toLocaleString() || 0}
-                    </p>
-                </div>
+                {/* 1. STATUS WINDOW (Main Card) */}
+                <StatusWindow
+                    username={profile.username}
+                    attributes={playerAttributes}
+                    adminMode={profile.is_admin} // God Mode for Admins
+                />
 
-                {/* HTB Rank */}
-                <div className="glass p-6 rounded-lg border border-system-blue/30">
-                    <div className="flex items-center gap-3 mb-3">
-                        <Target className="w-6 h-6 text-system-blue" />
-                        <h3 className="text-sm font-rajdhani font-semibold text-muted-foreground uppercase">
-                            HTB Rank
-                        </h3>
-                    </div>
-                    {htbStats ? (
-                        <p className="text-3xl font-rajdhani font-bold text-system-blue">
-                            {htbStats.rank}
-                        </p>
-                    ) : (
-                        <Link
-                            href="/profile"
-                            className="text-sm text-muted-foreground hover:text-system-blue transition-colors"
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    {/* 2. ACTIVITY LOG (Quest Log Aesthetic) */}
+                    <SystemWindow
+                        title="System Logs"
+                        className="lg:col-span-2 p-6"
+                        borderColor="var(--system-green)"
+                    >
+                        <div className="flex items-center justify-between mb-4 text-xs font-tech text-muted-foreground/50 border-b border-white/5 pb-2">
+                            <span>TIMESTAMP</span>
+                            <span>SOURCE</span>
+                            <span>EVENT_ID</span>
+                        </div>
+
+                        <div className="space-y-2">
+                            {recentTransactions.length > 0 ? (
+                                recentTransactions.map((tx) => (
+                                    <div
+                                        key={tx.id}
+                                        className="group flex items-center justify-between p-3 rounded bg-white/5 hover:bg-white/10 border border-transparent hover:border-system-green/30 transition-all cursor-default"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2 bg-black/40 rounded border border-white/10 group-hover:border-system-green/50">
+                                                {getSourceIcon(tx.source)}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-rajdhani font-semibold text-white group-hover:text-system-green transition-colors">
+                                                    {tx.description}
+                                                </p>
+                                                <p className="text-xs font-tech text-muted-foreground">
+                                                    {formatDate(tx.created_at)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className={`font-mono text-lg font-bold ${tx.points > 0 ? 'text-system-green' : 'text-system-red'}`}>
+                                            {tx.points > 0 ? '+' : ''}{tx.points}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-8 text-muted-foreground font-tech">
+                                    [NO LOGS RECORDED]
+                                </div>
+                            )}
+                        </div>
+                    </SystemWindow>
+
+                    {/* 3. EXTERNAL DATA (HTB Integration) */}
+                    <div className="space-y-8">
+                        <SystemWindow
+                            title="External Connection"
+                            className="p-6"
+                            borderColor="#FF2A2A" // Red for "External/Danger"
                         >
-                            Link HTB Account →
-                        </Link>
-                    )}
-                </div>
+                            <div className="mb-4">
+                                <h3 className="text-lg font-rajdhani font-bold text-white flex items-center gap-2">
+                                    <Activity className="w-5 h-5 text-system-red" />
+                                    HackTheBox
+                                </h3>
+                                <p className="text-xs font-tech text-muted-foreground">
+                                    STATUS: {htbProfile ? 'CONNECTED' : 'DISCONNECTED'}
+                                </p>
+                            </div>
 
-                {/* HTB Points */}
-                <div className="glass p-6 rounded-lg border border-border">
-                    <div className="flex items-center gap-3 mb-3">
-                        <Zap className="w-6 h-6 text-yellow-400" />
-                        <h3 className="text-sm font-rajdhani font-semibold text-muted-foreground uppercase">
-                            HTB Points
-                        </h3>
-                    </div>
-                    <p className="text-3xl font-mono font-bold text-foreground">
-                        {htbStats?.points?.toLocaleString() || '—'}
-                    </p>
-                </div>
+                            {htbProfile && htbStats ? (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="p-3 bg-black/40 rounded border border-white/10">
+                                            <span className="text-xs text-muted-foreground block text-center">RANK</span>
+                                            <span className="text-lg font-rajdhani font-bold text-white block text-center truncate">
+                                                {htbStats.rank}
+                                            </span>
+                                        </div>
+                                        <div className="p-3 bg-black/40 rounded border border-white/10">
+                                            <span className="text-xs text-muted-foreground block text-center">OWNED</span>
+                                            <span className="text-lg font-rajdhani font-bold text-system-red block text-center">
+                                                {htbStats.machines_owned + htbStats.challenges_owned}
+                                            </span>
+                                        </div>
+                                    </div>
 
-                {/* Machines Owned */}
-                <div className="glass p-6 rounded-lg border border-border">
-                    <div className="flex items-center gap-3 mb-3">
-                        <TrendingUp className="w-6 h-6 text-green-400" />
-                        <h3 className="text-sm font-rajdhani font-semibold text-muted-foreground uppercase">
-                            Machines
-                        </h3>
-                    </div>
-                    <p className="text-3xl font-mono font-bold text-foreground">
-                        {htbStats?.machines_owned || 0}
-                    </p>
-                </div>
-            </div>
+                                    <div className="w-full h-[1px] bg-white/10" />
 
-            {/* HTB Stats Details */}
-            {htbProfile && htbStats && (
-                <div className="system-window p-6 rounded-lg mb-8">
-                    <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-2xl font-rajdhani font-bold text-foreground flex items-center gap-2">
-                            <Activity className="w-6 h-6 text-system-green" />
-                            HackTheBox Stats
-                        </h2>
-                        <a
-                            href={`https://app.hackthebox.com/users/${htbProfile.htb_user_id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-system-blue hover:text-system-green transition-colors flex items-center gap-1"
-                        >
-                            View Profile <ExternalLink className="w-4 h-4" />
-                        </a>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="glass p-4 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">User Bloods</p>
-                            <p className="text-2xl font-mono text-red-400 font-bold">{htbStats.user_bloods || 0}</p>
-                        </div>
-                        <div className="glass p-4 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">System Bloods</p>
-                            <p className="text-2xl font-mono text-red-600 font-bold">{htbStats.system_bloods || 0}</p>
-                        </div>
-                        <div className="glass p-4 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">Machines</p>
-                            <p className="text-2xl font-mono text-green-400 font-bold">{htbStats.machines_owned || 0}</p>
-                        </div>
-                        <div className="glass p-4 rounded-lg">
-                            <p className="text-xs text-muted-foreground mb-1">Challenges</p>
-                            <p className="text-2xl font-mono text-blue-400 font-bold">{htbStats.challenges_owned || 0}</p>
-                        </div>
-                    </div>
-
-                    <p className="text-xs text-muted-foreground mt-4">
-                        Last sync: {htbProfile.last_sync ? formatDate(htbProfile.last_sync) : 'Never'}
-                    </p>
-                </div>
-            )}
-
-            {/* Recent Activity */}
-            <div className="system-window p-6 rounded-lg">
-                <h2 className="text-2xl font-rajdhani font-bold text-foreground mb-4">
-                    Recent Points Activity
-                </h2>
-
-                {recentTransactions.length > 0 ? (
-                    <div className="space-y-3">
-                        {recentTransactions.map((transaction) => (
-                            <div
-                                key={transaction.id}
-                                className="glass p-4 rounded-lg flex items-center justify-between hover:bg-muted/50 transition-colors"
-                            >
-                                <div className="flex items-center gap-3">
-                                    <span className="text-2xl">{getSourceIcon(transaction.source)}</span>
-                                    <div>
-                                        <p className="text-sm font-medium text-foreground">
-                                            {transaction.description}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            {formatDate(transaction.created_at)}
-                                        </p>
+                                    <div className="flex justify-between items-center text-xs font-tech">
+                                        <span className="text-muted-foreground">Packet Loss: 0%</span>
+                                        <a
+                                            href={`https://app.hackthebox.com/users/${htbProfile.htb_user_id}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-system-red hover:underline"
+                                        >
+                                            OPEN TERMINAL {'>'}
+                                        </a>
                                     </div>
                                 </div>
-                                <div className={`text-lg font-mono font-bold ${transaction.points > 0 ? 'text-system-green' : 'text-system-red'
-                                    }`}>
-                                    {transaction.points > 0 ? '+' : ''}{transaction.points}
+                            ) : (
+                                <div className="text-center py-6">
+                                    <Link
+                                        href="/profile"
+                                        className="inline-block px-4 py-2 bg-system-red/20 border border-system-red/50 text-system-red rounded font-tech text-sm hover:bg-system-red/30 transition-colors"
+                                    >
+                                        [ ESTABLISH UPLINK ]
+                                    </Link>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="glass p-8 rounded-lg text-center">
-                        <p className="text-muted-foreground">Aucune activité récente</p>
-                        <p className="text-sm text-muted-foreground mt-2">
-                            Commence à gagner des points en pwn des machines HTB !
-                        </p>
-                    </div>
-                )}
-            </div>
+                            )}
+                        </SystemWindow>
 
-            {/* Quick Actions */}
-            {profile?.is_admin && (
-                <div className="mt-8 system-window p-6 rounded-lg border-2 border-system-red/30">
-                    <h2 className="text-xl font-rajdhani font-bold text-system-red mb-4 flex items-center gap-2">
-                        👑 Admin Quick Actions
-                    </h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <Link
-                            href="/administration"
-                            className="glass p-4 rounded-lg text-center hover:bg-system-red/10 transition-colors"
-                        >
-                            <p className="text-sm font-rajdhani font-semibold">Admin Panel</p>
-                        </Link>
-                        <Link
-                            href="/administration/members"
-                            className="glass p-4 rounded-lg text-center hover:bg-system-red/10 transition-colors"
-                        >
-                            <p className="text-sm font-rajdhani font-semibold">Manage Members</p>
-                        </Link>
-                        <Link
-                            href="/members"
-                            className="glass p-4 rounded-lg text-center hover:bg-system-blue/10 transition-colors"
-                        >
-                            <p className="text-sm font-rajdhani font-semibold">View Members</p>
-                        </Link>
-                        <Link
-                            href="/scoreboard"
-                            className="glass p-4 rounded-lg text-center hover:bg-system-green/10 transition-colors"
-                        >
-                            <p className="text-sm font-rajdhani font-semibold">Scoreboard</p>
-                        </Link>
+                        {/* Admin Tools */}
+                        {profile.is_admin && (
+                            <SystemWindow
+                                title="Administrator"
+                                className="p-6"
+                                borderColor="#FFD700"
+                            >
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Link
+                                        href="/administration"
+                                        className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-center hover:bg-yellow-500/20 transition-all"
+                                    >
+                                        <Crown className="w-6 h-6 text-yellow-400 mx-auto mb-1" />
+                                        <span className="text-xs font-rajdhani font-bold text-yellow-200">PANEL</span>
+                                    </Link>
+                                    <Link
+                                        href="/administration/members"
+                                        className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-center hover:bg-yellow-500/20 transition-all"
+                                    >
+                                        <span className="text-lg font-mono font-bold text-yellow-400 block mb-1">ALL</span>
+                                        <span className="text-xs font-rajdhani font-bold text-yellow-200">MEMBERS</span>
+                                    </Link>
+                                </div>
+                            </SystemWindow>
+                        )}
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 }
