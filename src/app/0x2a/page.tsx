@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-client';
-import { Shield, Zap, Users, Terminal, Sparkles, Key } from 'lucide-react';
+import { Shield, Zap, Users, Terminal, Sparkles } from 'lucide-react';
 
 export default function SecretLoginPage() {
     const [loading, setLoading] = useState(false);
@@ -111,8 +111,12 @@ export default function SecretLoginPage() {
 
             <div className="relative z-10 w-full max-w-md">
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-lg bg-gradient-to-br from-green-500/20 to-blue-500/20 border border-green-500/30 mb-4 backdrop-blur-sm">
-                        <Shield className="w-10 h-10 text-green-400" />
+                    <div className="inline-flex items-center justify-center w-24 h-24 rounded-lg mb-4">
+                        <img
+                            src="/assets/logo.png"
+                            alt="EPIHACK Logo"
+                            className="w-full h-full object-contain"
+                        />
                     </div>
                     <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent font-rajdhani">
                         EPIHACK
@@ -136,13 +140,9 @@ export default function SecretLoginPage() {
                     )}
 
                     {showHint && !konamiActivated && (
-                        <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                            <div className="flex items-center gap-2 mb-2">
-                                <Key className="w-4 h-4 text-yellow-400" />
-                                <p className="text-xs text-yellow-400 font-tech font-semibold">HINT</p>
-                            </div>
-                            <p className="text-xs text-yellow-300/70 font-tech">
-                                The classics never die... ↑↑↓↓←→←→BA
+                        <div className="mb-6 p-3 bg-muted/30 border border-border rounded-lg">
+                            <p className="text-xs text-muted-foreground font-tech text-center">
+                                // The old ways still work...
                             </p>
                         </div>
                     )}
