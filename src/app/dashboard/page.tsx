@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase-client';
-import { ExternalLink, Activity, Trophy, Zap, MessageSquare, Sword, Crown, Flag } from 'lucide-react';
+import { ExternalLink, Activity, Trophy, Zap, MessageSquare, Sword, Crown, Flag, Target } from 'lucide-react';
 import Link from 'next/link';
 import { StatusWindow } from '@/components/system/StatusWindow';
 import { SystemWindow } from '@/components/system/SystemWindow';
