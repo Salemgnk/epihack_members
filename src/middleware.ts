@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
   try {
     // Routes publiques (pas de vérification d'auth)
-    const publicRoutes = ['/0x2a', '/auth/callback', '/force-logout', '/api', '/_next', '/favicon.ico'];
+    const publicRoutes = ['/login', '/0x2a', '/auth/callback', '/force-logout', '/api', '/_next', '/favicon.ico'];
     const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route));
 
     if (isPublicRoute) {
