@@ -67,11 +67,12 @@ export default function DashboardPage() {
             const supabase = createClient();
 
             // Get current user
-            const { data: { user } } = await supabase.auth.getSession();
-            if (!user) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user) {
                 window.location.href = '/0x2a';
                 return;
             }
+            const user = session.user;
 
             // Fetch profile
             const { data: profileData } = await supabase
