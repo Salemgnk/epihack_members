@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
   try {
     // Routes publiques (pas de vérification d'auth)
-    const publicRoutes = ['/login', '/auth/callback', '/force-logout', '/api', '/_next', '/favicon.ico'];
+    const publicRoutes = ['/0x2a', '/auth/callback', '/force-logout', '/api', '/_next', '/favicon.ico'];
     const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname.startsWith(route));
 
     if (isPublicRoute) {
@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
 
     if (!supabaseUrl || !supabaseKey) {
       console.error('Missing Supabase environment variables');
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/0x2a', request.url));
     }
 
     let response = NextResponse.next({
@@ -86,14 +86,14 @@ export async function middleware(request: NextRequest) {
 
     // Si pas de session, rediriger vers login
     if (!session) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.redirect(new URL('/0x2a', request.url));
     }
 
     return response;
   } catch (error) {
     console.error('Middleware error:', error);
     // En cas d'erreur, rediriger vers login plutôt que de crasher
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/0x2a', request.url));
   }
 }
 
