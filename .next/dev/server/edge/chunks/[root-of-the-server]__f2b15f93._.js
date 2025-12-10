@@ -27,72 +27,91 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 ;
 ;
 async function middleware(request) {
-    let response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
-        request: {
-            headers: request.headers
+    try {
+        // Routes publiques (pas de vérification d'auth)
+        const publicRoutes = [
+            '/login',
+            '/auth/callback',
+            '/force-logout',
+            '/api',
+            '/_next',
+            '/favicon.ico'
+        ];
+        const isPublicRoute = publicRoutes.some((route)=>request.nextUrl.pathname.startsWith(route));
+        if (isPublicRoute) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next();
         }
-    });
-    const supabase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createServerClient$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["createServerClient"])(("TURBOPACK compile-time value", "https://asgvycffaqvkceibdrqe.supabase.co"), ("TURBOPACK compile-time value", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZ3Z5Y2ZmYXF2a2NlaWJkcnFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQyMjEsImV4cCI6MjA3NTQ4MDIyMX0.qYWtB7EWEwNzJyAKyG4iNMsUj9EqSReodNqaHPSKRa8"), {
-        cookies: {
-            get (name) {
-                return request.cookies.get(name)?.value;
-            },
-            set (name, value, options) {
-                request.cookies.set({
-                    name,
-                    value,
-                    ...options
-                });
-                response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
-                    request: {
-                        headers: request.headers
-                    }
-                });
-                response.cookies.set({
-                    name,
-                    value,
-                    ...options
-                });
-            },
-            remove (name, options) {
-                request.cookies.set({
-                    name,
-                    value: '',
-                    ...options
-                });
-                response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
-                    request: {
-                        headers: request.headers
-                    }
-                });
-                response.cookies.set({
-                    name,
-                    value: '',
-                    ...options
-                });
+        // Vérifier que les variables d'environnement sont définies
+        const supabaseUrl = ("TURBOPACK compile-time value", "https://asgvycffaqvkceibdrqe.supabase.co");
+        const supabaseKey = ("TURBOPACK compile-time value", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFzZ3Z5Y2ZmYXF2a2NlaWJkcnFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDQyMjEsImV4cCI6MjA3NTQ4MDIyMX0.qYWtB7EWEwNzJyAKyG4iNMsUj9EqSReodNqaHPSKRa8");
+        if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+        ;
+        let response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
+            request: {
+                headers: request.headers
             }
+        });
+        const supabase = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$supabase$2f$ssr$2f$dist$2f$module$2f$createServerClient$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["createServerClient"])(supabaseUrl, supabaseKey, {
+            cookies: {
+                get (name) {
+                    return request.cookies.get(name)?.value;
+                },
+                set (name, value, options) {
+                    try {
+                        request.cookies.set({
+                            name,
+                            value,
+                            ...options
+                        });
+                        response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
+                            request: {
+                                headers: request.headers
+                            }
+                        });
+                        response.cookies.set({
+                            name,
+                            value,
+                            ...options
+                        });
+                    } catch (error) {
+                        console.error('Error setting cookie:', error);
+                    }
+                },
+                remove (name, options) {
+                    try {
+                        request.cookies.set({
+                            name,
+                            value: '',
+                            ...options
+                        });
+                        response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].next({
+                            request: {
+                                headers: request.headers
+                            }
+                        });
+                        response.cookies.set({
+                            name,
+                            value: '',
+                            ...options
+                        });
+                    } catch (error) {
+                        console.error('Error removing cookie:', error);
+                    }
+                }
+            }
+        });
+        // Vérifier la session pour toutes les autres routes
+        const { data: { session } } = await supabase.auth.getSession();
+        // Si pas de session, rediriger vers login
+        if (!session) {
+            return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(new URL('/login', request.url));
         }
-    });
-    // Routes publiques (pas de vérification d'auth)
-    const publicRoutes = [
-        '/login',
-        '/auth/callback',
-        '/force-logout',
-        '/api',
-        '/_next',
-        '/favicon.ico'
-    ];
-    const isPublicRoute = publicRoutes.some((route)=>request.nextUrl.pathname.startsWith(route));
-    if (isPublicRoute) {
         return response;
-    }
-    // Vérifier la session pour toutes les autres routes
-    const { data: { session } } = await supabase.auth.getSession();
-    // Si pas de session, rediriger vers login
-    if (!session) {
+    } catch (error) {
+        console.error('Middleware error:', error);
+        // En cas d'erreur, rediriger vers login plutôt que de crasher
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$esm$2f$server$2f$web$2f$exports$2f$index$2e$js__$5b$middleware$2d$edge$5d$__$28$ecmascript$29$__["NextResponse"].redirect(new URL('/login', request.url));
     }
-    return response;
 }
 const config = {
     matcher: [
