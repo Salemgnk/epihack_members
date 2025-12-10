@@ -14,7 +14,7 @@ export default function LoginPage() {
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
-                window.location.href = '/members';
+                window.location.href = '/';
             }
         };
         checkSession();
