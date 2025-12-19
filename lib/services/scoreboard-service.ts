@@ -3,10 +3,36 @@
  * Handles fetching and managing scoreboard data
  */
 import { createClient } from '@supabase/supabase-js';
-import { ScoreboardEntry, ScoreboardCacheRow } from '../types/scoreboard';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+// Type definitions
+export interface ScoreboardEntry {
+  rank: number;
+  memberId: string;
+  displayName: string;
+  avatarUrl: string | null;
+  totalPoints: number;
+  level: number;
+  htbStats?: {
+    rank: string;
+    user_owns: number;
+    system_owns: number;
+    user_bloods: number;
+    system_bloods: number;
+    respects: number;
+  };
+}
+
+export interface ScoreboardCacheRow {
+  id: string;
+  member_id: string;
+  rank: number;
+  total_points: number;
+  challenges_solved_today: number;
+  last_updated: string;
+}
 
 interface ScoreboardCacheWithProfile {
   id: string;
