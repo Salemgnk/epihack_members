@@ -232,21 +232,21 @@ export default function MembersDashboard() {
 
           {/* Quick Actions Grid (Top) */}
           <div className="grid sm:grid-cols-3 gap-4">
-            <Link href="/members/duels" className="contents">
+            <Link href="/duels" className="contents">
               <div className="system-window p-4 hover:bg-system-blue/10 transition-colors cursor-pointer group flex flex-col items-center justify-center h-32 border-system-blue/30 hover:border-system-blue">
                 <Swords className="w-8 h-8 text-system-blue mb-2 group-hover:scale-110 transition-transform" />
                 <span className="font-rajdhani font-bold text-lg text-white">ARENA</span>
                 <span className="font-tech text-xs text-muted-foreground">PVP DUELS</span>
               </div>
             </Link>
-            <Link href="/members/leaderboard" className="contents">
+            <Link href="/leaderboard" className="contents">
               <div className="system-window p-4 hover:bg-system-green/10 transition-colors cursor-pointer group flex flex-col items-center justify-center h-32 border-system-green/30 hover:border-system-green">
                 <Trophy className="w-8 h-8 text-system-green mb-2 group-hover:scale-110 transition-transform" />
                 <span className="font-rajdhani font-bold text-lg text-white">RANKINGS</span>
                 <span className="font-tech text-xs text-muted-foreground">LEADERBOARD</span>
               </div>
             </Link>
-            <Link href="/members/settings/htb" className="contents">
+            <Link href="/settings/htb" className="contents">
               <div className="system-window p-4 hover:bg-white/10 transition-colors cursor-pointer group flex flex-col items-center justify-center h-32 border-white/20 hover:border-white/50">
                 <Terminal className="w-8 h-8 text-white/70 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="font-rajdhani font-bold text-lg text-white">CONFIG</span>
