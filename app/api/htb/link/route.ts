@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { HTBClient } from '@/lib/htb-client';
+import { htbClient } from '@/lib/htb-client';
 
 /**
  * POST /api/htb/link
@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
         }
 
         // Verify HTB account exists
-        const htbClient = new HTBClient(process.env.HTB_APP_TOKEN!);
         const profile = await htbClient.getUserProfile(username);
 
         if (!profile) {
