@@ -269,7 +269,7 @@ export default function MembersDashboard() {
                       <p className="text-xs text-muted-foreground mb-3 font-tech">
                         Link your HackTheBox account to unlock full system capabilities.
                       </p>
-                      <Link href="/members/settings/htb" className="text-xs bg-system-red hover:bg-system-red/80 text-black font-bold px-3 py-1 rounded-sm">
+                      <Link href="/settings/htb" className="text-xs bg-system-red hover:bg-system-red/80 text-black font-bold px-3 py-1 rounded-sm">
                         EXECUTE
                       </Link>
                     </div>
