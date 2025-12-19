@@ -56,12 +56,18 @@ export async function addPoints(params: AddPointsParams): Promise<boolean> {
             return false;
         }
 
-        // Update balance
+        // Update balance - fetch current then update
+        const { data: currentBalance } = await supabase
+            .from('member_points_balance')
+            .select('total_points')
+            .eq('member_id', params.memberId)
+            .single();
+
+        const newTotal = (currentBalance?.total_points || 0) + params.amount;
+
         const { error: balanceError } = await supabase
             .from('member_points_balance')
-            .update({
-                total_points: supabase.raw(`total_points + ${params.amount}`),
-            })
+            .update({ total_points: newTotal })
             .eq('member_id', params.memberId);
 
         if (balanceError) {
@@ -98,12 +104,18 @@ export async function removePoints(params: AddPointsParams): Promise<boolean> {
             return false;
         }
 
-        // Update balance
+        // Update balance - fetch current then update
+        const { data: currentBalance } = await supabase
+            .from('member_points_balance')
+            .select('total_points')
+            .eq('member_id', params.memberId)
+            .single();
+
+        const newTotal = (currentBalance?.total_points || 0) - params.amount;
+
         const { error: balanceError } = await supabase
             .from('member_points_balance')
-            .update({
-                total_points: supabase.raw(`total_points - ${params.amount}`),
-            })
+            .update({ total_points: Math.max(0, newTotal) }) // Prevent negative
             .eq('member_id', params.memberId);
 
         if (balanceError) {
