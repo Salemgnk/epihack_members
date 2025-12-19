@@ -99,7 +99,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Erreur lors de la création du duel' }, { status: 500 });
         }
 
-        // TODO: Send notification to challenged user
+        // Send notification to challenged user
+        const { createNotification } = await import('@/lib/services/notification-service');
+        await createNotification({
+            memberId: challengedId,
+            type: 'DUEL_CHALLENGE',
+            title: 'Nouveau défi !',
+            message: `Vous avez été défié sur ${htbMachineName}`,
+            data: { duelId: duel.id, machineId: htbMachineId },
+        });
 
         return NextResponse.json({ success: true, duel });
 
