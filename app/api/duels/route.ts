@@ -151,8 +151,8 @@ export async function GET(request: NextRequest) {
             .from('duels')
             .select(`
         *,
-        challenger:profiles!duels_challenger_id_fkey(id, full_name, avatar_url),
-        challenged:profiles!duels_challenged_id_fkey(id, full_name, avatar_url)
+        challenger:profiles!duels_challenger_id_fkey(id, display_name, avatar_url),
+        challenged:profiles!duels_challenged_id_fkey(id, display_name, avatar_url)
       `)
             .or(`challenger_id.eq.${user.id},challenged_id.eq.${user.id}`)
             .eq('status', status)
