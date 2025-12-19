@@ -9,7 +9,7 @@ import { markAsRead } from '@/lib/services/notification-service';
  */
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
@@ -37,8 +37,8 @@ export async function PATCH(
             return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
         }
 
-        const notificationId = params.id;
-        const success = await markAsRead(notificationId);
+        const { id } = await params;
+        const success = await markAsRead(id);
 
         return NextResponse.json({ success });
     } catch (error) {
