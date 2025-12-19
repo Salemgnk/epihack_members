@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { PanelsLeftRight, ChevronLeft, Trophy, Swords, Terminal, Scroll, Settings } from "lucide-react";
-import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase-client';
 
 export default function Sidebar() {
