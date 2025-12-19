@@ -162,6 +162,17 @@ BEGIN
     END IF;
 END $$;
 
+-- Add active column if it doesn't exist
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'quests' AND column_name = 'active'
+    ) THEN
+        ALTER TABLE quests ADD COLUMN active BOOLEAN DEFAULT TRUE;
+    END IF;
+END $$;
+
 -- Create indexes if they don't exist
 CREATE INDEX IF NOT EXISTS idx_quests_category_id ON quests(category_id);
 CREATE INDEX IF NOT EXISTS idx_quests_active ON quests(active);
