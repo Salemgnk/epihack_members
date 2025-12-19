@@ -12,6 +12,7 @@ interface Quest {
     description: string;
     points_reward: number;
     difficulty: 'easy' | 'medium' | 'hard' | 'insane';
+    quest_type: 'manual' | 'auto';
     deadline: string | null;
     penalty_percentage: number;
     category?: {
@@ -199,8 +200,8 @@ export default function QuestsPage() {
                     <button
                         onClick={() => setFilter('all')}
                         className={`px-4 py-2 rounded font-tech text-sm transition-colors ${filter === 'all'
-                                ? 'bg-system-blue text-black'
-                                : 'bg-white/10 text-white hover:bg-white/20'
+                            ? 'bg-system-blue text-black'
+                            : 'bg-white/10 text-white hover:bg-white/20'
                             }`}
                     >
                         TOUTES
@@ -208,8 +209,8 @@ export default function QuestsPage() {
                     <button
                         onClick={() => setFilter('active')}
                         className={`px-4 py-2 rounded font-tech text-sm transition-colors ${filter === 'active'
-                                ? 'bg-system-blue text-black'
-                                : 'bg-white/10 text-white hover:bg-white/20'
+                            ? 'bg-system-blue text-black'
+                            : 'bg-white/10 text-white hover:bg-white/20'
                             }`}
                     >
                         ACTIVES
@@ -217,8 +218,8 @@ export default function QuestsPage() {
                     <button
                         onClick={() => setFilter('completed')}
                         className={`px-4 py-2 rounded font-tech text-sm transition-colors ${filter === 'completed'
-                                ? 'bg-system-blue text-black'
-                                : 'bg-white/10 text-white hover:bg-white/20'
+                            ? 'bg-system-blue text-black'
+                            : 'bg-white/10 text-white hover:bg-white/20'
                             }`}
                     >
                         COMPLÉTÉES
