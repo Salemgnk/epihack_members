@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { htbClient } from '@/lib/htb-client';
+import { HTBClient } from '@/lib/htb-client';
 
 /**
  * POST /api/htb/link
@@ -41,7 +41,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Username requis' }, { status: 400 });
         }
 
-        // Verify HTB account exists
+        // Check if HTB token is configured
+        if (!process.env.HTB_APP_TOKEN) {
+            return NextResponse.json({ error: 'HTB_APP_TOKEN not configured on server' }, { status: 500 });
+        }
+
+        // Verify HTB account exists - create instance with token from env
+        const htbClient = new HTBClient(process.env.HTB_APP_TOKEN);
         const profile = await htbClient.getUserProfile(username);
 
         if (!profile) {
