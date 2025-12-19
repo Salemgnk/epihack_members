@@ -46,9 +46,9 @@ class HTBClient {
     private baseURL: string;
     private token: string;
 
-    constructor() {
+    constructor(token?: string) {
         this.baseURL = HTB_API_BASE;
-        this.token = HTB_APP_TOKEN || '';
+        this.token = token || HTB_APP_TOKEN || '';
     }
 
     private async fetch<T>(endpoint: string): Promise<T> {
@@ -136,6 +136,7 @@ class HTBClient {
     }
 }
 
+export { HTBClient };
 export const htbClient = new HTBClient();
 
 export type { HTBUserProfile, HTBActivity, HTBMachine };
