@@ -173,6 +173,30 @@ BEGIN
     END IF;
 END $$;
 
+-- Add created_by column if it doesn't exist
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'quests' AND column_name = 'created_by'
+    ) THEN
+        -- We can't add NOT NULL with a reference to auth.users easily
+        -- So we add it as nullable first, then you can update later if needed
+        ALTER TABLE quests ADD COLUMN created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+    END IF;
+END $$;
+
+-- Add deadline column if it doesn't exist
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'quests' AND column_name = 'deadline'
+    ) THEN
+        ALTER TABLE quests ADD COLUMN deadline TIMESTAMPTZ;
+    END IF;
+END $$;
+
 -- Create indexes if they don't exist
 CREATE INDEX IF NOT EXISTS idx_quests_category_id ON quests(category_id);
 CREATE INDEX IF NOT EXISTS idx_quests_active ON quests(active);
