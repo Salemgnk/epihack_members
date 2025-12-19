@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase-client';
-import ConnectedNavbar from './connected-navbar';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -41,9 +40,10 @@ export default function Navbar() {
 
   const closeMenu = () => setOpen(false);
 
-  // If user is authenticated and not on landing page, show ConnectedNavbar
+  // If user is authenticated and not on landing page, show connected version
+  // TODO: Implement ConnectedNavbar with NotificationBell
   if (isAuthenticated && pathname !== '/') {
-    return <ConnectedNavbar />;
+    return null; // Temporarily disabled until ConnectedNavbar is implemented
   }
 
   // Show loading state while checking auth
