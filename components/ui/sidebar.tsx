@@ -3,10 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { PanelsLeftRight, ChevronLeft, Trophy, Swords, Terminal, Scroll } from "lucide-react";
+import { PanelsLeftRight, ChevronLeft, Trophy, Swords, Terminal, Scroll, Settings } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase-client';
 
 export default function Sidebar() {
   const [expanded, setExpanded] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
 
   // Load persisted state on mount
@@ -15,6 +18,15 @@ export default function Sidebar() {
       const saved = localStorage.getItem("sidebar-expanded");
       if (saved !== null) setExpanded(saved === "1");
     } catch { }
+  }, []);
+
+  // Check admin status
+  useEffect(() => {
+    async function checkAdmin() {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsAdmin(user?.email === process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL);
+    }
+    checkAdmin();
   }, []);
 
   // Persist state and update layout push width
@@ -33,6 +45,11 @@ export default function Sidebar() {
     { label: "Arena", href: "/duels", icon: Swords },
     { label: "Access", href: "/settings/htb", icon: Terminal },
   ];
+
+  // Add admin link if admin
+  if (isAdmin) {
+    pageLinks.push({ label: "Admin", href: "/admin/quests", icon: Settings });
+  }
 
   return (
     <aside
