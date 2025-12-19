@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
  */
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
@@ -42,7 +42,7 @@ export async function DELETE(
             return NextResponse.json({ error: 'Accès refusé' }, { status: 403 });
         }
 
-        const questId = params.id;
+        const { id: questId } = await params;
 
         const { error } = await supabase
             .from('quests')

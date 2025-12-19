@@ -9,7 +9,7 @@ import { assignQuest } from '@/lib/services/quest-service';
  */
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
@@ -44,7 +44,7 @@ export async function POST(
         }
 
         const { memberIds, assignToAll } = await request.json();
-        const questId = params.id;
+        const { id: questId } = await params;
 
         let targetMemberIds: string[] = [];
 

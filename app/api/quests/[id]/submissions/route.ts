@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
  */
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
@@ -42,7 +42,7 @@ export async function GET(
             return NextResponse.json({ error: 'Accès refusé' }, { status: 403 });
         }
 
-        const questId = params.id;
+        const { id: questId } = await params;
 
         const { data: submissions, error } = await supabase
             .from('member_quests')

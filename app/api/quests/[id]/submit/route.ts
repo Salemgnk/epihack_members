@@ -9,7 +9,7 @@ import { submitQuest } from '@/lib/services/quest-service';
  */
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
@@ -37,8 +37,8 @@ export async function POST(
             return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
         }
 
-        const questId = params.id;
-        const { submissionData } = await request.json();
+        const { id: questId } = await params;
+        const { memberId, submissionData } = await request.json();
 
         if (!submissionData) {
             return NextResponse.json({ error: 'Données de soumission requises' }, { status: 400 });
