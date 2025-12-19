@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { PanelsLeftRight, ChevronLeft, Trophy, Swords, Target, Terminal, Scroll } from "lucide-react";
+import { PanelsLeftRight, ChevronLeft, Trophy, Swords, Terminal, Scroll } from "lucide-react";
 
 export default function Sidebar() {
   const [expanded, setExpanded] = useState(false);
@@ -31,7 +31,6 @@ export default function Sidebar() {
     { label: "Quests", href: "/quests", icon: Scroll },
     { label: "Rankings", href: "/leaderboard", icon: Trophy },
     { label: "Arena", href: "/duels", icon: Swords },
-    { label: "Profile", href: "/profile/me", icon: Target },
     { label: "Access", href: "/settings/htb", icon: Terminal },
   ];
 
