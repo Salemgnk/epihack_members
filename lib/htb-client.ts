@@ -136,7 +136,10 @@ class HTBClient {
     }
 }
 
+// Export class for custom instantiation
 export { HTBClient };
+
+// Export default instance
 export const htbClient = new HTBClient();
 
 export type { HTBUserProfile, HTBActivity, HTBMachine };
