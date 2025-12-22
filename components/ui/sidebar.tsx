@@ -40,7 +40,7 @@ export default function Sidebar() {
   const pageLinks = [
     { label: "Dashboard", href: "/", icon: PanelsLeftRight },
     { label: "Quests", href: "/quests", icon: Scroll },
-    { label: "Rankings", href: "/leaderboard", icon: Trophy },
+    { label: "Rankings", href: "/rankings", icon: Trophy },
     { label: "Arena", href: "/duels", icon: Swords },
     { label: "Access", href: "/settings/htb", icon: Terminal },
   ];
