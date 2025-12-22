@@ -3,7 +3,7 @@
  * Uses EpiHack's App Token to fetch member stats
  */
 
-const HTB_API_BASE = process.env.HTB_API_BASE_URL || 'https://www.hackthebox.com/api/v4';
+const HTB_API_BASE_URL = process.env.HTB_API_BASE_URL || 'https://labs.hackthebox.com/api/v4';
 const HTB_APP_TOKEN = process.env.HTB_APP_TOKEN;
 
 if (!HTB_APP_TOKEN) {
@@ -42,13 +42,16 @@ interface HTBMachine {
     retired: boolean;
 }
 
-class HTBClient {
+/**
+ * HTB API Client
+ */
+export class HTBClient {
     private baseURL: string;
     private token: string;
 
     constructor(token?: string) {
-        this.baseURL = HTB_API_BASE;
-        this.token = token || HTB_APP_TOKEN || '';
+        this.baseURL = HTB_API_BASE_URL;
+        this.token = token || HTB_APP_TOKEN;
     }
 
     private async fetch<T>(endpoint: string): Promise<T> {
