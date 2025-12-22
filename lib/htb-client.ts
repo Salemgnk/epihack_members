@@ -108,21 +108,6 @@ class HTBClient {
     }
 
     /**
-     * Search user by username (using public profile endpoint)
-     */
-    async searchUserByUsername(username: string): Promise<HTBUserProfile | null> {
-        try {
-            // HTB doesn't have a direct search endpoint, we need to use the profile endpoint
-            // This is a workaround - in production, you might need to maintain a mapping
-            const data = await this.fetch<{ profile: HTBUserProfile }>(`/user/profile/basic/${username}`);
-            return data.profile;
-        } catch (error) {
-            console.error(`Failed to find HTB user: ${username}`, error);
-            return null;
-        }
-    }
-
-    /**
      * Get active machines list
      */
     async getActiveMachines(): Promise<HTBMachine[]> {
