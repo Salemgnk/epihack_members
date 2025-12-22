@@ -8,9 +8,7 @@ import { supabase } from '@/lib/supabase-client';
 interface RankedMember {
     id: string;
     username: string;
-    h
-
-    tb_username: string | null;
+    htb_username: string | null;
     total_points: number;
     rank_name: string;
     rank_color: string;
@@ -59,11 +57,11 @@ export default function RankingsPage() {
                 return {
                     id: member.member_id,
                     username,
-                    htb_username: member.profiles?.htb_username || null,
+                    htb_username: (member.profiles as any)?.[0]?.htb_username || null,
                     total_points: member.total_points,
-                    rank_name: member.ranks?.name || 'bronze',
-                    rank_color: member.ranks?.color || '#CD7F32',
-                    rank_display_name: member.ranks?.display_name || 'Bronze',
+                    rank_name: (member.ranks as any)?.[0]?.name || 'bronze',
+                    rank_color: (member.ranks as any)?.[0]?.color || '#CD7F32',
+                    rank_display_name: (member.ranks as any)?.[0]?.display_name || 'Bronze',
                     position: index + 1
                 };
             }) || [];
