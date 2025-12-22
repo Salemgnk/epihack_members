@@ -31,6 +31,7 @@ export default function MembersDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     loadDashboard();
@@ -42,6 +43,15 @@ export default function MembersDashboard() {
       if (!currentUser) return;
 
       setUser(currentUser);
+
+      // Get user profile with HTB data
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('htb_username, htb_user_id, last_synced_at')
+        .eq('id', currentUser.id)
+        .single();
+
+      setProfile(userProfile);
 
       // Get points balance
       const { data: balance } = await supabase
@@ -152,7 +162,7 @@ export default function MembersDashboard() {
                 </div>
 
                 {/* Level Badge */}
-                <div className="absolute -bottom-2 -right-2 bg-black border border-system-green px-3 py-1 rounded-sm text-system-green font-bold font-rajdhani text-sm">
+                <div className="absolute -bottom-2 -right-2 bg-black border border-system-green px-3 py-1 rounded-sm text-system-green font-bold font-rajdhani text-sm z-10">
                   LVL. {Math.floor((stats?.totalPoints || 0) / 100) + 1}
                 </div>
               </div>
@@ -160,8 +170,18 @@ export default function MembersDashboard() {
               <h2 className="text-2xl font-bold font-rajdhani text-white mb-1">
                 {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
               </h2>
-              <div className="text-xs font-tech text-muted-foreground bg-white/5 px-2 py-1 rounded">
-                CLASS: HACKER
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="text-xs font-tech text-muted-foreground bg-white/5 px-2 py-1 rounded">
+                  CLASS: HACKER
+                </div>
+                {profile?.htb_username && (
+                  <div className="text-xs font-tech text-system-green bg-system-green/10 border border-system-green/30 px-2 py-1 rounded flex items-center gap-1">
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
+                    </svg>
+                    HTB: {profile.htb_username}
+                  </div>
+                )}
               </div>
             </div>
 
