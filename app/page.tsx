@@ -83,23 +83,12 @@ export default function MembersDashboard() {
         .single();
       setNextRank(nextRankData);
 
-      // Check HTB linked
-      const { data: htbProfile } = await supabase
-        .from('htb_profiles')
-        .select('htb_user_id')
-        .eq('member_id', currentUser.id)
-        .single();
+      // HTB is linked if user has htb_username in profile
+      const htbLinked = !!userProfile?.htb_username;
 
-      // Get HTB stats if linked
+      // Get HTB stats if linked (future: sync from HTB API)
       let htbStats = null;
-      if (htbProfile) {
-        const { data: stats } = await supabase
-          .from('htb_stats_cache')
-          .select('*')
-          .eq('htb_profile_id', currentUser.id)
-          .single();
-        htbStats = stats;
-      }
+      // TODO: Fetch HTB stats from API when needed
 
       // Get active duels count
       const { count: activeDuelsCount } = await supabase
@@ -118,7 +107,7 @@ export default function MembersDashboard() {
 
       setStats({
         totalPoints: balance?.total_points || 0,
-        htbLinked: !!htbProfile,
+        htbLinked: htbLinked,
         htbStats,
         activeDuels: activeDuelsCount || 0,
         recentTransactions: transactions || [],
