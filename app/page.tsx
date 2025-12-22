@@ -46,10 +46,10 @@ export default function MembersDashboard() {
 
       setUser(currentUser);
 
-      // Get user profile with HTB data
+      // Get user profile with HTB data and rank
       const { data: userProfile } = await supabase
         .from('profiles')
-        .select('htb_username, htb_user_id, last_synced_at')
+        .select('htb_username, htb_user_id, last_synced_at, current_rank_id')
         .eq('id', currentUser.id)
         .single();
 
