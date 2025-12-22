@@ -56,23 +56,15 @@ export async function addPoints(params: AddPointsParams): Promise<boolean> {
             return false;
         }
 
-        // Update balance - fetch current then update
-        const { data: currentBalance } = await supabase
-            .from('member_points_balance')
-            .select('total_points')
-            .eq('member_id', params.memberId)
-            .single();
+        console.log(`✅ Points transaction created: +${params.amount} for ${params.memberId}`);
 
-        const newTotal = (currentBalance?.total_points || 0) + params.amount;
-
-        const { error: balanceError } = await supabase
-            .from('member_points_balance')
-            .update({ total_points: newTotal })
-            .eq('member_id', params.memberId);
-
-        if (balanceError) {
-            console.error('Error updating points balance:', balanceError);
-            return false;
+        // Refresh materialized view using database function
+        try {
+            await supabase.rpc('refresh_points_balance');
+            console.log('✅ Points balance refreshed');
+        } catch (refreshError) {
+            console.error('⚠️ Could not refresh balance view:', refreshError);
+            // Don't fail - view will refresh on next query
         }
 
         // Auto-update member's rank based on new points total
