@@ -36,19 +36,10 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json();
         const { identifier, username } = body;
-        const userInput = identifier || username; // Support both new and old format
+        const userInput = identifier || username;
 
         if (!userInput) {
-            return NextResponse.json({ error: 'HTB User ID required' }, { status: 400 });
-        }
-
-        // Parse as User ID (must be a number)
-        const userId = parseInt(userInput);
-
-        if (isNaN(userId) || userId <= 0) {
-            return NextResponse.json({
-                error: 'Invalid User ID. Please enter the numeric ID from your HTB profile URL (e.g., 123456)'
-            }, { status: 400 });
+            return NextResponse.json({ error: 'HTB User ID or username required' }, { status: 400 });
         }
 
         // Check if HTB token is configured
@@ -56,18 +47,40 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'HTB_APP_TOKEN not configured on server' }, { status: 500 });
         }
 
-        // Get profile by User ID (only reliable method with App Token)
+        // Create HTB client instance with labs.hackthebox.com base URL
         const htbClient = new HTBClient(process.env.HTB_APP_TOKEN);
+        let profile = null;
+
+        // Try as User ID first (if it's a number)
+        const userId = parseInt(userInput);
+        if (!isNaN(userId) && userId > 0) {
+            try {
+                console.log('Trying User ID:', userId);
+                profile = await htbClient.getUserProfile(userId);
+                console.log('Profile found by ID:', profile?.name);
+            } catch (error: any) {
+                console.log('User ID lookup failed, trying username search...', error.message);
+            }
+        }
+
+        // If not found by ID, try as username using POST /search/users
+        if (!profile) {
+            try {
+                console.log('Searching by username:', userInput);
+                profile = await htbClient.searchUserByUsername(userInput);
+                console.log('Profile found by username:', profile?.name);
+            } catch (error: any) {
+                console.error('Username search failed:', error.message);
+            }
+        }
+
+        if (!profile) {
+            return NextResponse.json({
+                error: 'HTB account not found. Verify your User ID or username is correct.'
+            }, { status: 404 });
+        }
 
         try {
-            const profile = await htbClient.getUserProfile(userId);
-
-            if (!profile) {
-                return NextResponse.json({
-                    error: 'HTB account not found. Verify your User ID is correct.'
-                }, { status: 404 });
-            }
-
             // Update user profile with HTB data
             const { error: updateError } = await supabase
                 .from('profiles')
@@ -91,9 +104,9 @@ export async function POST(request: NextRequest) {
                 }
             });
         } catch (error: any) {
-            console.error('HTB API error:', error);
+            console.error('Database update error:', error);
             return NextResponse.json({
-                error: `Failed to fetch HTB profile: ${error.message}`
+                error: `Failed to save HTB profile: ${error.message}`
             }, { status: 500 });
         }
     } catch (error: any) {
