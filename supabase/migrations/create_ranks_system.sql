@@ -82,36 +82,8 @@ CREATE POLICY "Users can view their titles"
 ON user_titles FOR SELECT
 USING (auth.uid() = user_id);
 
--- Admins can manage everything
-CREATE POLICY "Admins can manage ranks"
-ON ranks FOR ALL
-USING (
-  EXISTS (
-    SELECT 1 FROM profiles 
-    WHERE id = auth.uid() 
-    AND is_super_admin = true
-  )
-);
-
-CREATE POLICY "Admins can manage titles"
-ON titles FOR ALL
-USING (
-  EXISTS (
-    SELECT 1 FROM profiles 
-    WHERE id = auth.uid() 
-    AND is_super_admin = true
-  )
-);
-
-CREATE POLICY "Admins can manage user titles"
-ON user_titles FOR ALL
-USING (
-  EXISTS (
-    SELECT 1 FROM profiles 
-    WHERE id = auth.uid() 
-    AND is_super_admin = true
-  )
-);
+-- TODO: Add admin policies once is_super_admin column exists
+-- For now, admins can manage via Supabase Dashboard
 
 -- Comment
 COMMENT ON TABLE ranks IS 'Progressive ranking system based on points: Bronze → Argent → Or → Platine → Diamant → Orichalque';
