@@ -75,6 +75,15 @@ export async function addPoints(params: AddPointsParams): Promise<boolean> {
             return false;
         }
 
+        // Auto-update member's rank based on new points total
+        try {
+            const { updateMemberRank } = await import('./rank-service');
+            await updateMemberRank(params.memberId);
+        } catch (rankError) {
+            // Don't fail points addition if rank update fails
+            console.error('Error updating rank:', rankError);
+        }
+
         return true;
     } catch (error) {
         console.error('Unexpected error in addPoints:', error);

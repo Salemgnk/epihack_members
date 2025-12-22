@@ -32,6 +32,8 @@ export default function MembersDashboard() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [currentRank, setCurrentRank] = useState<any>(null);
+  const [nextRank, setNextRank] = useState<any>(null);
 
   useEffect(() => {
     loadDashboard();
@@ -53,12 +55,33 @@ export default function MembersDashboard() {
 
       setProfile(userProfile);
 
-      // Get points balance
+      // Get points balance FIRST
       const { data: balance } = await supabase
         .from('member_points_balance')
         .select('total_points')
         .eq('member_id', currentUser.id)
         .single();
+
+      // Get user's current rank
+      if (userProfile?.current_rank_id) {
+        const { data: rank } = await supabase
+          .from('ranks')
+          .select('*')
+          .eq('id', userProfile.current_rank_id)
+          .single();
+        setCurrentRank(rank);
+      }
+
+      // Get next rank based on points
+      const totalPoints = balance?.total_points || 0;
+      const { data: nextRankData } = await supabase
+        .from('ranks')
+        .select('*')
+        .gt('points_required', totalPoints)
+        .order('points_required', { ascending: true })
+        .limit(1)
+        .single();
+      setNextRank(nextRankData);
 
       // Check HTB linked
       const { data: htbProfile } = await supabase
@@ -203,25 +226,51 @@ export default function MembersDashboard() {
             </div>
           </SystemCard>
 
-          {/* Attributes Hex Grid (Visual) */}
-          <SystemCard title="ATTRIBUTES" delay={2}>
+          {/* Rank Display */}
+          <SystemCard title="RANK" delay={2}>
             <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                <span className="font-tech text-system-blue">INT (Machines)</span>
-                <span className="font-rajdhani font-bold text-xl">{stats?.htbStats?.machines_owned || 0}</span>
+              {/* Current Rank */}
+              <div className="text-center">
+                <div
+                  className="text-4xl font-bold font-rajdhani mb-2"
+                  style={{ color: currentRank?.color || '#CD7F32' }}
+                >
+                  {currentRank?.display_name || 'Bronze'}
+                </div>
+                <div className="text-xs font-tech text-muted-foreground">
+                  {stats?.totalPoints || 0} points
+                </div>
               </div>
-              <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                <span className="font-tech text-system-green">DEX (Challenges)</span>
-                <span className="font-rajdhani font-bold text-xl">{stats?.htbStats?.challenges_owned || 0}</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                <span className="font-tech text-system-red">STR (Bloods)</span>
-                <span className="font-rajdhani font-bold text-xl">{stats?.htbStats?.user_bloods || 0}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-tech text-yellow-500">CHA (Duels)</span>
-                <span className="font-rajdhani font-bold text-xl">{stats?.activeDuels || 0}</span>
-              </div>
+
+              {/* Progress Bar */}
+              {nextRank && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs font-tech">
+                    <span className="text-muted-foreground">Progress</span>
+                    <span className="text-white">
+                      {Math.floor(((stats?.totalPoints || 0) / nextRank.points_required) * 100)}%
+                    </span>
+                  </div>
+                  <div className="h-2 bg-black border border-white/10 rounded-sm overflow-hidden">
+                    <div
+                      className="h-full transition-all duration-500"
+                      style={{
+                        width: `${Math.min(((stats?.totalPoints || 0) / nextRank.points_required) * 100, 100)}%`,
+                        background: `linear-gradient(to right, ${currentRank?.color || '#CD7F32'}, ${nextRank.color})`
+                      }}
+                    />
+                  </div>
+                  <div className="text-xs font-tech text-muted-foreground text-center">
+                    Next: <span className="text-white font-bold">{nextRank.display_name}</span> @ {nextRank.points_required} pts
+                  </div>
+                </div>
+              )}
+
+              {!nextRank && (
+                <div className="text-center text-xs font-tech text-system-green">
+                  ⭐ MAX RANK ACHIEVED ⭐
+                </div>
+              )}
             </div>
           </SystemCard>
         </div>
