@@ -80,19 +80,44 @@ class HTBClient {
     }
 
     /**
-     * Search user by username and get profile
+     * Search user by username using POST /search/users
+     * Based on official HTB API documentation
      */
     async searchUserByUsername(username: string): Promise<HTBUserProfile | null> {
         try {
-            // HTB API endpoint to search users
-            const data = await this.fetch<{ data: HTBUserProfile[] }>(`/search/users?searchTerm=${encodeURIComponent(username)}`);
+            if (!this.token) {
+                throw new Error('HTB_APP_TOKEN not configured');
+            }
 
-            // Find exact match (case insensitive)
-            const exactMatch = data.data?.find(
-                (user) => user.name.toLowerCase() === username.toLowerCase()
-            );
+            // HTB API uses POST for user search (official documentation)
+            const response = await fetch(`${this.baseURL}/search/users`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: username
+                })
+            });
 
-            return exactMatch || null;
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`HTB Search API Error (${response.status}): ${error.substring(0, 200)}`);
+            }
+
+            const data = await response.json();
+
+            // API returns an array of users
+            if (Array.isArray(data) && data.length > 0) {
+                // Find exact match (case insensitive)
+                const exactMatch = data.find(
+                    (user: any) => user.name?.toLowerCase() === username.toLowerCase()
+                );
+                return exactMatch || data[0]; // Return exact match or first result
+            }
+
+            return null;
         } catch (error) {
             console.error('Error searching user:', error);
             return null;
