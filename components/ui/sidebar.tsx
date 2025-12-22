@@ -23,7 +23,15 @@ export default function Sidebar() {
   useEffect(() => {
     async function checkAdmin() {
       const { data: { user } } = await supabase.auth.getUser();
-      setIsAdmin(user?.email === process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL);
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
+
+      setIsAdmin(profile?.is_admin || false);
     }
     checkAdmin();
   }, []);

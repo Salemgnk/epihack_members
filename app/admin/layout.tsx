@@ -22,9 +22,21 @@ export default function AdminLayout({
 
     const checkAdmin = async () => {
         const { data: { user } } = await supabase.auth.getUser();
-        const adminEmail = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL;
 
-        if (user?.email === adminEmail) {
+        if (!user) {
+            router.push('/');
+            setLoading(false);
+            return;
+        }
+
+        // Check if user has is_admin flag in profiles
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single();
+
+        if (profile?.is_admin) {
             setIsAdmin(true);
         } else {
             router.push('/');
