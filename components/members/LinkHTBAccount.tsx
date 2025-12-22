@@ -86,7 +86,7 @@ export default function LinkHTBAccount() {
                     <form onSubmit={handleLinkAccount} className="space-y-6 relative z-10">
                         <div>
                             <label htmlFor="htb-identifier" className="block text-xs font-bold font-rajdhani text-system-green mb-2 uppercase tracking-wider">
-                                HackTheBox User ID or Username
+                                HackTheBox User ID (Required)
                             </label>
                             <div className="relative">
                                 <input
@@ -94,7 +94,7 @@ export default function LinkHTBAccount() {
                                     type="text"
                                     value={identifier}
                                     onChange={(e) => setIdentifier(e.target.value)}
-                                    placeholder="Enter User ID (e.g., 123456) OR username (e.g., Scorpi777)"
+                                    placeholder="Enter your numeric User ID (e.g., 1761582)"
                                     className="w-full pl-4 pr-4 py-3 bg-black border border-white/20 rounded-sm focus:outline-none focus:border-system-green focus:ring-1 focus:ring-system-green font-tech text-white tracking-wider placeholder-white/20 transition-all"
                                     disabled={loading}
                                 />
@@ -102,7 +102,7 @@ export default function LinkHTBAccount() {
                             </div>
                             <p className="text-[10px] font-tech text-muted-foreground mt-2 flex items-center gap-1">
                                 <ShieldAlert className="w-3 h-3" />
-                                User ID recommended (from profile URL). Username works too.
+                                Go to app.hackthebox.com/profile - your ID is the number in the URL
                             </p>
                         </div>
 
