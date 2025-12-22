@@ -46,7 +46,7 @@ export default function Sidebar() {
 
   // Add admin link if admin
   if (isAdmin) {
-    pageLinks.push({ label: "Admin", href: "/admin/quests", icon: Settings });
+    pageLinks.push({ label: "Admin", href: "/admin/members", icon: Settings });
   }
 
   return (
