@@ -86,12 +86,28 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: 'Error linking account to database' }, { status: 500 });
             }
 
+            // Award 50 points for linking HTB account
+            try {
+                const { addPoints } = await import('@/lib/services/points-service');
+                await addPoints({
+                    memberId: user.id,
+                    amount: 50,
+                    source: 'quest_completion',
+                    description: 'HTB Account Linked - Main Quest Completed'
+                });
+                console.log('Awarded 50 points for HTB linking');
+            } catch (pointsError) {
+                // Don't fail the linking if points award fails
+                console.error('Error awarding points:', pointsError);
+            }
+
             return NextResponse.json({
                 success: true,
                 profile: {
                     username: profile.name,
                     id: profile.id,
-                }
+                },
+                pointsAwarded: 50
             });
         } catch (error: any) {
             console.error('HTB API error:', error);

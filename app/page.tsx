@@ -185,27 +185,6 @@ export default function MembersDashboard() {
               </div>
             </div>
 
-            {/* HP/MP Bars (Visual only for now) */}
-            <div className="space-y-3 mb-6">
-              <div>
-                <div className="flex justify-between text-xs font-tech mb-1">
-                  <span className="text-system-red">HP (Streak)</span>
-                  <span className="text-white">100/100</span>
-                </div>
-                <div className="h-2 bg-black border border-white/10 rounded-sm overflow-hidden">
-                  <div className="h-full bg-system-red w-full" />
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-xs font-tech mb-1">
-                  <span className="text-system-blue">MP (Energy)</span>
-                  <span className="text-white">75/100</span>
-                </div>
-                <div className="h-2 bg-black border border-white/10 rounded-sm overflow-hidden">
-                  <div className="h-full bg-system-blue w-3/4" />
-                </div>
-              </div>
-            </div>
 
             {/* Main Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
