@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { SystemCard } from '@/components/ui/SystemCard';
 import { Plus, Edit, Trash2, Users, Eye, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
+import AssignQuestModal from '@/components/admin/AssignQuestModal';
 
 interface Quest {
     id: string;
@@ -39,6 +40,7 @@ export default function AdminQuestsPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'quests' | 'categories'>('quests');
+    const [assignModalQuest, setAssignModalQuest] = useState<{ id: string; title: string } | null>(null);
 
     useEffect(() => {
         loadQuests();
@@ -235,10 +237,7 @@ export default function AdminQuestsPage() {
                                             SOUMISSIONS
                                         </Link>
                                         <button
-                                            onClick={() => {
-                                                // TODO: Implement assign modal
-                                                alert('Assignation à implémenter');
-                                            }}
+                                            onClick={() => setAssignModalQuest({ id: quest.id, title: quest.title })}
                                             className="px-4 py-2 bg-system-green hover:bg-system-green/80 text-black font-rajdhani font-bold rounded transition-colors flex items-center gap-2 text-sm"
                                         >
                                             <Users className="w-4 h-4" />
