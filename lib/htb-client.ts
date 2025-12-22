@@ -80,6 +80,26 @@ class HTBClient {
     }
 
     /**
+     * Search user by username and get profile
+     */
+    async searchUserByUsername(username: string): Promise<HTBUserProfile | null> {
+        try {
+            // HTB API endpoint to search users
+            const data = await this.fetch<{ data: HTBUserProfile[] }>(`/search/users?searchTerm=${encodeURIComponent(username)}`);
+
+            // Find exact match (case insensitive)
+            const exactMatch = data.data?.find(
+                (user) => user.name.toLowerCase() === username.toLowerCase()
+            );
+
+            return exactMatch || null;
+        } catch (error) {
+            console.error('Error searching user:', error);
+            return null;
+        }
+    }
+
+    /**
      * Get user activity
      */
     async getUserActivity(userId: number): Promise<HTBActivity[]> {

@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
 
         // Verify HTB account exists - create instance with token from env
         const htbClient = new HTBClient(process.env.HTB_APP_TOKEN);
-        const profile = await htbClient.getUserProfile(username);
+        const profile = await htbClient.searchUserByUsername(username);
 
         if (!profile) {
             return NextResponse.json({ error: 'Compte HTB introuvable' }, { status: 404 });
