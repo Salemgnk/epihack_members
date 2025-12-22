@@ -29,18 +29,33 @@ export default function AdminLayout({
             return;
         }
 
-        // Check if user has is_admin flag in profiles
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('is_admin')
-            .eq('id', user.id)
-            .single();
+        try {
+            // Try to check is_admin flag in profiles
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('is_admin')
+                .eq('id', user.id)
+                .single();
 
-        if (profile?.is_admin) {
-            setIsAdmin(true);
-        } else {
+            if (error) {
+                // Column doesn't exist yet - fallback to email check
+                console.warn('is_admin column not found, using email fallback');
+                const adminEmail = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL;
+                if (user.email === adminEmail) {
+                    setIsAdmin(true);
+                } else {
+                    router.push('/');
+                }
+            } else if (profile?.is_admin) {
+                setIsAdmin(true);
+            } else {
+                router.push('/');
+            }
+        } catch (error) {
+            console.error('Admin check error:', error);
             router.push('/');
         }
+
         setLoading(false);
     };
 

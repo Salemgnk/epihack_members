@@ -25,13 +25,24 @@ export default function Sidebar() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', user.id)
-        .single();
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single();
 
-      setIsAdmin(profile?.is_admin || false);
+        if (error) {
+          // Fallback to email check if column doesn't exist
+          const adminEmail = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL;
+          setIsAdmin(user.email === adminEmail);
+        } else {
+          setIsAdmin(profile?.is_admin || false);
+        }
+      } catch (error) {
+        console.error('Admin check error:', error);
+        setIsAdmin(false);
+      }
     }
     checkAdmin();
   }, []);

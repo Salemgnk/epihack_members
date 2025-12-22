@@ -27,7 +27,7 @@ export async function GET() {
 
             const { data: profiles } = await supabaseAdmin
                 .from('profiles')
-                .select(`id, htb_username, current_rank_id, is_admin, ranks(name, display_name, color)`)
+                .select(`id, htb_username, current_rank_id, ranks(name, display_name, color)`)
                 .in('id', memberIds);
 
             const { data: { users } } = await supabaseAdmin.auth.admin.listUsers();
@@ -62,7 +62,7 @@ export async function GET() {
 
             const { data: profiles } = await supabase
                 .from('profiles')
-                .select(`id, htb_username, current_rank_id, is_admin, ranks(name, display_name, color)`)
+                .select(`id, htb_username, current_rank_id, ranks(name, display_name, color)`)
                 .in('id', memberIds);
 
             const members = balances?.map((balance: any, index: number) => {
