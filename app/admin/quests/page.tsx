@@ -6,6 +6,7 @@ import { SystemCard } from '@/components/ui/SystemCard';
 import { Plus, Edit, Trash2, Users, Eye, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import AssignQuestModal from '@/components/admin/AssignQuestModal';
+import CreateCategoryModal from '@/components/admin/CreateCategoryModal';
 
 interface Quest {
     id: string;
@@ -41,6 +42,7 @@ export default function AdminQuestsPage() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'quests' | 'categories'>('quests');
     const [assignModalQuest, setAssignModalQuest] = useState<{ id: string; title: string } | null>(null);
+    const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
 
     useEffect(() => {
         loadQuests();
@@ -264,35 +266,71 @@ export default function AdminQuestsPage() {
                     )}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {categories.map((category) => (
-                        <div key={category.id} className="system-window p-6">
-                            <div className="flex items-start justify-between mb-4">
-                                <div
-                                    className="text-4xl"
+                <div className="space-y-4">
+                    {/* Create Category Button */}
+                    <button
+                        onClick={() => setShowCreateCategoryModal(true)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-system-green/20 hover:bg-system-green/30 text-system-green border border-system-green/30 rounded-sm font-tech text-sm transition-all"
+                    >
+                        <Plus className="w-4 h-4" />
+                        CRÉER CATÉGORIE
+                    </button>
+
+                    {/* Categories Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {categories.map((category) => (
+                            <div key={category.id} className="system-window p-6">
+                                <div className="flex items-start justify-between mb-4">
+                                    <div
+                                        className="text-4xl"
+                                        style={{ color: category.color }}
+                                    >
+                                        {category.icon}
+                                    </div>
+                                    <button
+                                        onClick={() => deleteCategory(category.id)}
+                                        className="text-system-red hover:text-system-red/80 transition-colors"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <h3
+                                    className="font-rajdhani font-bold text-lg mb-2"
                                     style={{ color: category.color }}
                                 >
-                                    {category.icon}
-                                </div>
-                                <button
-                                    onClick={() => deleteCategory(category.id)}
-                                    className="text-system-red hover:text-system-red/80 transition-colors"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                    {category.name}
+                                </h3>
+                                <p className="font-tech text-xs text-muted-foreground">
+                                    {category.description || 'Pas de description'}
+                                </p>
                             </div>
-                            <h3
-                                className="font-rajdhani font-bold text-lg mb-2"
-                                style={{ color: category.color }}
-                            >
-                                {category.name}
-                            </h3>
-                            <p className="font-tech text-xs text-muted-foreground">
-                                {category.description || 'Pas de description'}
-                            </p>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
+            )}
+
+            {/* Assign Quest Modal */}
+            {assignModalQuest && (
+                <AssignQuestModal
+                    questId={assignModalQuest.id}
+                    questTitle={assignModalQuest.title}
+                    onClose={() => setAssignModalQuest(null)}
+                    onSuccess={() => {
+                        loadQuests();
+                        setAssignModalQuest(null);
+                    }}
+                />
+            )}
+
+            {/* Create Category Modal */}
+            {showCreateCategoryModal && (
+                <CreateCategoryModal
+                    onClose={() => setShowCreateCategoryModal(false)}
+                    onSuccess={() => {
+                        loadCategories();
+                        setShowCreateCategoryModal(false);
+                    }}
+                />
             )}
         </div>
     );
