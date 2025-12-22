@@ -56,7 +56,14 @@ export async function createQuest(questData: Omit<Quest, 'id' | 'created_at' | '
 
     if (error) {
         console.error('Error creating quest:', error);
-        return null;
+        console.error('Quest data attempted:', JSON.stringify(questData, null, 2));
+        console.error('Error details:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint
+        });
+        throw new Error(`Failed to create quest: ${error.message}`);
     }
 
     return data;

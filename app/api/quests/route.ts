@@ -127,25 +127,29 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Données manquantes' }, { status: 400 });
         }
 
-        const quest = await createQuest({
-            title,
-            description,
-            points_reward,
-            difficulty,
-            category_id: category_id || null,
-            quest_type,
-            validation_flag: validation_flag || null,
-            deadline: deadline || null,
-            penalty_percentage: penalty_percentage || 20,
-            created_by: user.id,
-            active: true,
-        });
+        try {
+            const quest = await createQuest({
+                title,
+                description,
+                points_reward,
+                difficulty,
+                category_id: category_id || null,
+                quest_type,
+                validation_flag: validation_flag || null,
+                deadline: deadline || null,
+                penalty_percentage: penalty_percentage || 20,
+                created_by: user.id,
+                active: true,
+            });
 
-        if (!quest) {
-            return NextResponse.json({ error: 'Erreur lors de la création de la quête' }, { status: 500 });
+            return NextResponse.json({ success: true, quest });
+        } catch (createError: any) {
+            console.error('Create quest error:', createError);
+            return NextResponse.json({
+                error: 'Erreur lors de la création de la quête',
+                details: createError.message
+            }, { status: 500 });
         }
-
-        return NextResponse.json({ success: true, quest });
     } catch (error) {
         console.error('Unexpected error:', error);
         return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
