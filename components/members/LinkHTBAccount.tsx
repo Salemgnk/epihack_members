@@ -94,8 +94,8 @@ export default function LinkHTBAccount() {
                                     type="text"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    placeholder="ENTER USERNAME..."
-                                    className="w-full pl-4 pr-4 py-3 bg-black border border-white/20 rounded-sm focus:outline-none focus:border-system-green focus:ring-1 focus:ring-system-green font-tech text-white uppercase tracking-wider placeholder-white/20 transition-all"
+                                    placeholder="Enter username..."
+                                    className="w-full pl-4 pr-4 py-3 bg-black border border-white/20 rounded-sm focus:outline-none focus:border-system-green focus:ring-1 focus:ring-system-green font-tech text-white tracking-wider placeholder-white/20 transition-all"
                                     disabled={loading}
                                 />
                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-system-green animate-pulse" />
