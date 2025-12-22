@@ -39,35 +39,11 @@ export default function AdminQuestsPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'quests' | 'categories'>('quests');
-    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        checkAdminAccess();
+        loadQuests();
+        loadCategories();
     }, []);
-
-    useEffect(() => {
-        if (isAdmin) {
-            loadQuests();
-            loadCategories();
-        }
-    }, [isAdmin]);
-
-    const checkAdminAccess = async () => {
-        try {
-            const response = await fetch('/api/auth/session');
-            const data = await response.json();
-
-            const adminEmail = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL;
-            if (data.user?.email === adminEmail) {
-                setIsAdmin(true);
-            } else {
-                router.push('/');
-            }
-        } catch (error) {
-            console.error('Error checking admin access:', error);
-            router.push('/');
-        }
-    };
 
     const loadQuests = async () => {
         try {
@@ -133,17 +109,6 @@ export default function AdminQuestsPage() {
         }
     };
 
-    if (loading || !isAdmin) {
-        return (
-            <div className="flex justify-center items-center min-h-screen bg-system-bg">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 border-4 border-system-blue/30 border-t-system-blue rounded-full animate-spin" />
-                    <p className="font-rajdhani text-system-blue animate-pulse">VERIFYING ACCESS...</p>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             {/* Header */}
@@ -172,8 +137,8 @@ export default function AdminQuestsPage() {
                 <button
                     onClick={() => setActiveTab('quests')}
                     className={`px-6 py-3 rounded font-rajdhani font-bold transition-colors ${activeTab === 'quests'
-                            ? 'bg-system-blue text-black'
-                            : 'bg-white/10 text-white hover:bg-white/20'
+                        ? 'bg-system-blue text-black'
+                        : 'bg-white/10 text-white hover:bg-white/20'
                         }`}
                 >
                     QUÊTES ({quests.length})
@@ -181,8 +146,8 @@ export default function AdminQuestsPage() {
                 <button
                     onClick={() => setActiveTab('categories')}
                     className={`px-6 py-3 rounded font-rajdhani font-bold transition-colors ${activeTab === 'categories'
-                            ? 'bg-system-blue text-black'
-                            : 'bg-white/10 text-white hover:bg-white/20'
+                        ? 'bg-system-blue text-black'
+                        : 'bg-white/10 text-white hover:bg-white/20'
                         }`}
                 >
                     CATÉGORIES ({categories.length})
@@ -226,8 +191,8 @@ export default function AdminQuestsPage() {
                                                 {quest.difficulty.toUpperCase()}
                                             </span>
                                             <span className={`px-3 py-1 text-xs font-bold rounded border ${quest.active
-                                                    ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                                                    : 'bg-red-500/20 text-red-400 border-red-500/30'
+                                                ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                                                : 'bg-red-500/20 text-red-400 border-red-500/30'
                                                 }`}>
                                                 {quest.active ? <CheckCircle className="w-3 h-3 inline" /> : <XCircle className="w-3 h-3 inline" />}
                                                 {' '}{quest.active ? 'ACTIVE' : 'INACTIVE'}
