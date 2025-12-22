@@ -26,6 +26,9 @@ export default function CreateQuestPage() {
         validation_flag: '',
         deadline: '',
         penalty_percentage: 20,
+        recurrence_type: 'none' as 'none' | 'daily' | 'weekly' | 'monthly',
+        recurrence_reset_day: 1,
+        recurrence_enabled: false,
     });
 
     useEffect(() => {
@@ -55,6 +58,7 @@ export default function CreateQuestPage() {
                     category_id: formData.category_id || null,
                     validation_flag: formData.validation_flag || null,
                     deadline: formData.deadline || null,
+                    recurrence_reset_day: formData.recurrence_enabled ? formData.recurrence_reset_day : null,
                 }),
             });
 
