@@ -45,13 +45,13 @@ interface HTBMachine {
 /**
  * HTB API Client
  */
-export class HTBClient {
+class HTBClient {
     private baseURL: string;
     private token: string;
 
     constructor(token?: string) {
         this.baseURL = HTB_API_BASE_URL;
-        this.token = token || HTB_APP_TOKEN;
+        this.token = token || HTB_APP_TOKEN || '';
     }
 
     private async fetch<T>(endpoint: string): Promise<T> {
