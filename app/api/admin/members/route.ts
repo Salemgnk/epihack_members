@@ -1,15 +1,25 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Force dynamic route (don't pre-render at build time)
+export const dynamic = 'force-dynamic';
+
 // Server-side Supabase with service role for auth access
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!, // Need service role for auth.users access
-    { auth: { persistSession: false } }
-);
+function getSupabaseAdmin() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!url || !key) {
+        throw new Error('Missing Supabase credentials');
+    }
+
+    return createClient(url, key, { auth: { persistSession: false } });
+}
 
 export async function GET() {
     try {
+        const supabaseAdmin = getSupabaseAdmin();
+
         // Get all members with points and ranks
         const { data: balances, error: balanceError } = await supabaseAdmin
             .from('member_points_balance')
