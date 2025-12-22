@@ -6,15 +6,15 @@ import { Loader2, Link as LinkIcon, ExternalLink, ShieldAlert, Terminal, CheckCi
 import { SystemCard } from '@/components/ui/SystemCard';
 
 export default function LinkHTBAccount() {
-    const [username, setUsername] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [loading, setLoading] = useState(false);
     const { showToast } = useToast();
 
     const handleLinkAccount = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!username.trim()) {
-            showToast('PLEASE ENTER OPERATOR ID', 'error');
+        if (!identifier.trim()) {
+            showToast('PLEASE ENTER HTB USER ID OR USERNAME', 'error');
             return;
         }
 
@@ -25,7 +25,7 @@ export default function LinkHTBAccount() {
             const response = await fetch('/api/htb/link', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: username.trim() }),
+                body: JSON.stringify({ identifier: identifier.trim() }),
             });
 
             const data = await response.json();
@@ -35,7 +35,7 @@ export default function LinkHTBAccount() {
             }
 
             showToast('OPERATOR IDENTITY VERIFIED', 'success');
-            setUsername('');
+            setIdentifier('');
 
             // Refresh page to show linked account
             window.location.reload();
@@ -85,16 +85,16 @@ export default function LinkHTBAccount() {
 
                     <form onSubmit={handleLinkAccount} className="space-y-6 relative z-10">
                         <div>
-                            <label htmlFor="htb-username" className="block text-xs font-bold font-rajdhani text-system-green mb-2 uppercase tracking-wider">
-                                HackTheBox Agent ID
+                            <label htmlFor="htb-identifier" className="block text-xs font-bold font-rajdhani text-system-green mb-2 uppercase tracking-wider">
+                                HackTheBox User ID or Username
                             </label>
                             <div className="relative">
                                 <input
-                                    id="htb-username"
+                                    id="htb-identifier"
                                     type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    placeholder="Enter username..."
+                                    value={identifier}
+                                    onChange={(e) => setIdentifier(e.target.value)}
+                                    placeholder="Enter User ID (e.g., 123456) or username"
                                     className="w-full pl-4 pr-4 py-3 bg-black border border-white/20 rounded-sm focus:outline-none focus:border-system-green focus:ring-1 focus:ring-system-green font-tech text-white tracking-wider placeholder-white/20 transition-all"
                                     disabled={loading}
                                 />
@@ -102,7 +102,7 @@ export default function LinkHTBAccount() {
                             </div>
                             <p className="text-[10px] font-tech text-muted-foreground mt-2 flex items-center gap-1">
                                 <ShieldAlert className="w-3 h-3" />
-                                MUST MATCH PUBLIC HTB PROFILE EXACTLY
+                                Find your ID at app.hackthebox.com/profile (number in URL)
                             </p>
                         </div>
 

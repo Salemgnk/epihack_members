@@ -35,10 +35,11 @@ export async function POST(request: NextRequest) {
         }
 
         const body = await request.json();
-        const { username } = body;
+        const { identifier, username } = body;
+        const userInput = identifier || username; // Support both new and old format
 
-        if (!username) {
-            return NextResponse.json({ error: 'Username requis' }, { status: 400 });
+        if (!userInput) {
+            return NextResponse.json({ error: 'User ID or username required' }, { status: 400 });
         }
 
         // Check if HTB token is configured
@@ -46,19 +47,36 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'HTB_APP_TOKEN not configured on server' }, { status: 500 });
         }
 
-        // Verify HTB account exists - create instance with token from env
+        // Create HTB client instance
         const htbClient = new HTBClient(process.env.HTB_APP_TOKEN);
-        const profile = await htbClient.searchUserByUsername(username);
+        let profile = null;
+
+        // Try as User ID first (if it's a number)
+        const userId = parseInt(userInput);
+        if (!isNaN(userId) && userId > 0) {
+            try {
+                profile = await htbClient.getUserProfile(userId);
+            } catch (error) {
+                console.log('Not a valid user ID, trying as username:', error);
+            }
+        }
+
+        // If not found by ID, try as username
+        if (!profile) {
+            profile = await htbClient.searchUserByUsername(userInput);
+        }
 
         if (!profile) {
-            return NextResponse.json({ error: 'Compte HTB introuvable' }, { status: 404 });
+            return NextResponse.json({
+                error: 'HTB account not found. Try using your User ID from app.hackthebox.com/profile'
+            }, { status: 404 });
         }
 
         // Update user profile with HTB data
         const { error: updateError } = await supabase
             .from('profiles')
             .update({
-                htb_username: username,
+                htb_username: profile.name,
                 htb_user_id: profile.id,
                 last_synced_at: new Date().toISOString(),
             })
@@ -66,7 +84,7 @@ export async function POST(request: NextRequest) {
 
         if (updateError) {
             console.error('Error updating profile:', updateError);
-            return NextResponse.json({ error: 'Erreur lors de la liaison' }, { status: 500 });
+            return NextResponse.json({ error: 'Error linking account' }, { status: 500 });
         }
 
         return NextResponse.json({
@@ -78,6 +96,6 @@ export async function POST(request: NextRequest) {
         });
     } catch (error: any) {
         console.error('Unexpected error:', error);
-        return NextResponse.json({ error: error.message || 'Erreur serveur' }, { status: 500 });
+        return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
     }
 }
