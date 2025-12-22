@@ -86,7 +86,7 @@ export default function LinkHTBAccount() {
                     <form onSubmit={handleLinkAccount} className="space-y-6 relative z-10">
                         <div>
                             <label htmlFor="htb-identifier" className="block text-xs font-bold font-rajdhani text-system-green mb-2 uppercase tracking-wider">
-                                HackTheBox User ID or Username
+                                HackTheBox User ID (Required)
                             </label>
                             <div className="relative">
                                 <input
@@ -94,7 +94,7 @@ export default function LinkHTBAccount() {
                                     type="text"
                                     value={identifier}
                                     onChange={(e) => setIdentifier(e.target.value)}
-                                    placeholder="Enter User ID (e.g., 123456) or username"
+                                    placeholder="Enter your User ID (e.g., 123456)"
                                     className="w-full pl-4 pr-4 py-3 bg-black border border-white/20 rounded-sm focus:outline-none focus:border-system-green focus:ring-1 focus:ring-system-green font-tech text-white tracking-wider placeholder-white/20 transition-all"
                                     disabled={loading}
                                 />
@@ -102,13 +102,13 @@ export default function LinkHTBAccount() {
                             </div>
                             <p className="text-[10px] font-tech text-muted-foreground mt-2 flex items-center gap-1">
                                 <ShieldAlert className="w-3 h-3" />
-                                Find your ID at app.hackthebox.com/profile (number in URL)
+                                Find your ID in your profile URL: app.hackthebox.com/profile/[YOUR_ID]
                             </p>
                         </div>
 
                         <button
                             type="submit"
-                            disabled={loading || !username.trim()}
+                            disabled={loading || !identifier.trim()}
                             className="w-full py-3 bg-system-green hover:bg-system-green/90 text-black font-bold font-rajdhani rounded-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-wider shadow-[0_0_15px_rgba(0,255,157,0.3)] hover:shadow-[0_0_25px_rgba(0,255,157,0.5)]"
                         >
                             {loading ? (

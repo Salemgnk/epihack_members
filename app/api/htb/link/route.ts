@@ -39,7 +39,16 @@ export async function POST(request: NextRequest) {
         const userInput = identifier || username; // Support both new and old format
 
         if (!userInput) {
-            return NextResponse.json({ error: 'User ID or username required' }, { status: 400 });
+            return NextResponse.json({ error: 'HTB User ID required' }, { status: 400 });
+        }
+
+        // Parse as User ID (must be a number)
+        const userId = parseInt(userInput);
+
+        if (isNaN(userId) || userId <= 0) {
+            return NextResponse.json({
+                error: 'Invalid User ID. Please enter the numeric ID from your HTB profile URL (e.g., 123456)'
+            }, { status: 400 });
         }
 
         // Check if HTB token is configured
@@ -47,53 +56,46 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'HTB_APP_TOKEN not configured on server' }, { status: 500 });
         }
 
-        // Create HTB client instance
+        // Get profile by User ID (only reliable method with App Token)
         const htbClient = new HTBClient(process.env.HTB_APP_TOKEN);
-        let profile = null;
 
-        // Try as User ID first (if it's a number)
-        const userId = parseInt(userInput);
-        if (!isNaN(userId) && userId > 0) {
-            try {
-                profile = await htbClient.getUserProfile(userId);
-            } catch (error) {
-                console.log('Not a valid user ID, trying as username:', error);
+        try {
+            const profile = await htbClient.getUserProfile(userId);
+
+            if (!profile) {
+                return NextResponse.json({
+                    error: 'HTB account not found. Verify your User ID is correct.'
+                }, { status: 404 });
             }
-        }
 
-        // If not found by ID, try as username
-        if (!profile) {
-            profile = await htbClient.searchUserByUsername(userInput);
-        }
+            // Update user profile with HTB data
+            const { error: updateError } = await supabase
+                .from('profiles')
+                .update({
+                    htb_username: profile.name,
+                    htb_user_id: profile.id,
+                    last_synced_at: new Date().toISOString(),
+                })
+                .eq('id', user.id);
 
-        if (!profile) {
+            if (updateError) {
+                console.error('Error updating profile:', updateError);
+                return NextResponse.json({ error: 'Error linking account to database' }, { status: 500 });
+            }
+
             return NextResponse.json({
-                error: 'HTB account not found. Try using your User ID from app.hackthebox.com/profile'
-            }, { status: 404 });
+                success: true,
+                profile: {
+                    username: profile.name,
+                    id: profile.id,
+                }
+            });
+        } catch (error: any) {
+            console.error('HTB API error:', error);
+            return NextResponse.json({
+                error: `Failed to fetch HTB profile: ${error.message}`
+            }, { status: 500 });
         }
-
-        // Update user profile with HTB data
-        const { error: updateError } = await supabase
-            .from('profiles')
-            .update({
-                htb_username: profile.name,
-                htb_user_id: profile.id,
-                last_synced_at: new Date().toISOString(),
-            })
-            .eq('id', user.id);
-
-        if (updateError) {
-            console.error('Error updating profile:', updateError);
-            return NextResponse.json({ error: 'Error linking account' }, { status: 500 });
-        }
-
-        return NextResponse.json({
-            success: true,
-            profile: {
-                username: profile.name,
-                id: profile.id,
-            }
-        });
     } catch (error: any) {
         console.error('Unexpected error:', error);
         return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
